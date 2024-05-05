@@ -76,3 +76,24 @@ class BaseGameEnv:
     
     def is_position_taken(self, x: int, y: int):
         return self.board[x][y] != 0
+
+    def copy(self):
+        copy = BaseGameEnv()
+        copy.board = self.board
+        copy.player = self.player
+        copy.is_finished = self.is_finished
+        copy.win_player = self.win_player
+        copy.moves_count = self.moves_count
+        return copy
+    
+    def available_moves(self):
+        moves = []
+
+        for x in range(3):
+            for y in range(3):
+                position = self.board[x][y]
+                
+                if position == 0:
+                    moves.append((x, y))
+
+        return moves
