@@ -1,99 +1,90 @@
+import copy as Copy
+from environments.player_data import Player
+from environments.game_state_enum import GameState
+from environments.mappers import PLAYER_VALUE_TO_CHAR, PLAYER_TO_WIN_GAME_STATE
+
 class BaseGameEnv:
-    def __init__(self):
-        self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        self.player = -1
-        self.is_finished = False
-        self.win_player = 0
-        self.moves_count = 0
-    
-    def which_player_move(self):
-        return self.player
-    
-    def which_player_won(self):
-        return self.win_player
-    
-    def check_state(self):
-        if self.is_finished == True:
-            return
+    _empty_board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
-        c1 = self.board[0][0] + self.board[0][1] + self.board[0][2]
+    def __init__(self, board = None):
+        if board == None:
+            self._board = self._empty_board
+        else:
+            self._board = board
+        self._moves_count = 0
+        self._player = Player.create_x()
+        self._game_state = GameState.PLAYING
+    
+    @property
+    def current_player(self):
+        return self._player
+
+    @property
+    def game_state(self):
+        return self._game_state
+    
+    def _check_state(self):
+        c1 = self._board[0][0] + self._board[0][1] + self._board[0][2]
         if abs(c1) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        c2 = self.board[1][0] + self.board[1][1] + self.board[1][2]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        c2 = self._board[1][0] + self._board[1][1] + self._board[1][2]
         if abs(c2) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-        
-        c3 = self.board[2][0] + self.board[2][1] + self.board[2][2]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        c3 = self._board[2][0] + self._board[2][1] + self._board[2][2]
         if abs(c3) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-        
-        r1 = self.board[0][0] + self.board[1][0] + self.board[2][0]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        r1 = self._board[0][0] + self._board[1][0] + self._board[2][0]
         if abs(r1) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        r2 = self.board[0][1] + self.board[1][1] + self.board[2][1]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        r2 = self._board[0][1] + self._board[1][1] + self._board[2][1]
         if abs(r2) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        r3 = self.board[0][2] + self.board[1][2] + self.board[2][2]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        r3 = self._board[0][2] + self._board[1][2] + self._board[2][2]
         if abs(r3) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        b1 = self.board[0][0] + self.board[1][1] + self.board[2][2]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        b1 = self._board[0][0] + self._board[1][1] + self._board[2][2]
         if abs(b1) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        b2 = self.board[0][2] + self.board[1][1] + self.board[2][0]
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        b2 = self._board[0][2] + self._board[1][1] + self._board[2][0]
         if abs(b2) == 3:
-            self.win_player = self.player
-            self.is_finished = True
-
-        if self.moves_count > 8:
-            self.is_finished = True
-    
-    def move(self, x: int, y: int):
-        if self.win_player != 0:
-            raise Exception(f'The game is finished.')
-        
-        if self.board[x][y] != 0:
-            raise Exception(f'Position ({x},{y}) is already taken.')
-        
-        self.board[x][y] = self.player
-
-        self.moves_count += 1
-
-        self.check_state()
-
-        self.player *= -1
+            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+        if self._moves_count > 8:
+            self._game_state = GameState.DRAW
     
     def is_position_taken(self, x: int, y: int):
-        return self.board[x][y] != 0
-
-    def copy(self):
-        copy = BaseGameEnv()
-        copy.board = self.board
-        copy.player = self.player
-        copy.is_finished = self.is_finished
-        copy.win_player = self.win_player
-        copy.moves_count = self.moves_count
-        return copy
+        return self._board[x][y] != 0
+        
+    def move(self, x: int, y: int):
+        if self._game_state != GameState.PLAYING:
+            raise Exception(f'The game is finished.')
+        if self.is_position_taken(x, y):
+            raise Exception(f'Position ({x},{y}) is already taken.')
+        self._board[x][y] = self._player.value
+        self._moves_count += 1
+        self._check_state()
+        self._player = self._player.switch_player()
     
     def available_moves(self):
         moves = []
-
         for x in range(3):
             for y in range(3):
-                position = self.board[x][y]
-                
+                position = self._board[x][y]
                 if position == 0:
                     moves.append((x, y))
-
         return moves
+    
+    def restart(self):
+        self._board = self._empty_board
+        self._moves_count = 0
+        self._player = Player.create_x()
+        self._game_state = GameState.PLAYING
+
+    def copy(self):
+        return Copy.deepcopy(self)
+    
+    def print(self):
+        x_len = len(self._board)
+        for x_index in range(x_len - 1):
+            print('|'.join([PLAYER_VALUE_TO_CHAR[y] for y in self._board[x_index]]))
+            print('-+-+-')
+        print('|'.join([PLAYER_VALUE_TO_CHAR[y] for y in self._board[x_len - 1]]))
