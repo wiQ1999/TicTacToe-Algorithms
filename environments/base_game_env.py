@@ -4,11 +4,9 @@ from environments.game_state_enum import GameState
 from environments.mappers import PLAYER_VALUE_TO_CHAR, PLAYER_TO_WIN_GAME_STATE
 
 class BaseGameEnv:
-    _empty_board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
     def __init__(self, board = None):
         if board == None:
-            self._board = self._empty_board
+            self._board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         else:
             self._board = board
         self._moves_count = 0
@@ -74,7 +72,7 @@ class BaseGameEnv:
         return moves
     
     def restart(self):
-        self._board = self._empty_board
+        self._board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         self._moves_count = 0
         self._player = Player.create_x()
         self._game_state = GameState.PLAYING
