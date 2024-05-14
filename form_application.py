@@ -94,6 +94,7 @@ class FormApplication:
         self._game.move(x, y)
         self._buttons[x][y].config(text=symbol)
         if self._game.game_state == GameState.PLAYING:
+            self._root.after(0, self._player_auto_move)
             return
         elif self._game.game_state == GameState.DRAW:
             self._switch_positions(False)
@@ -103,7 +104,22 @@ class FormApplication:
             messagebox.showinfo("Game Over", f"Player {symbol} wins!")
 
     def run(self):
+        self._root.after(0, self._player_auto_move)
         self._root.mainloop()
+
+    def _player_auto_move(self):
+        current_player = None
+        if self._game.current_player.is_x:
+            current_player = self._player_x
+        else:
+            current_player = self._player_y
+        if current_player.is_clickable:
+            return
+        x, y = current_player.auto_move(self._game)
+        symbol = self._game.current_player.symbol
+        self._game.move(x, y)
+        self._buttons[x][y].config(text=symbol)
+        self._player_auto_move()
 
     def restart_game(self):
         self._game.restart()
@@ -111,3 +127,4 @@ class FormApplication:
         for x in range(3):
             for y in range(3):
                 self._buttons[x][y].config(text='')
+        self._root.after(0, self._player_auto_move)
