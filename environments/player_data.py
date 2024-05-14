@@ -22,6 +22,14 @@ class Player:
     def symbol(self):
         return 'X' if self._value == -1 else 'O'
     
+    @property
+    def is_x(self):
+        return self._value == -1
+    
+    @property
+    def is_o(self):
+        return self._value == 1
+
     def switch_player(self):
         return Player(self._value * -1)
 
