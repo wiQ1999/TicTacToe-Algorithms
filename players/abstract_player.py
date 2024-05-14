@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from environments.base_game_env import BaseGameEnv
+from typing import Tuple
 
 class AbstractPlayer(ABC):
     @property
@@ -8,5 +9,5 @@ class AbstractPlayer(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def auto_move(self, game_state: BaseGameEnv):
+    def auto_move(self, game_state: BaseGameEnv) -> Tuple[int, int]:
         raise NotImplementedError()
