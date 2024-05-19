@@ -25,27 +25,35 @@ class BaseGameEnv:
         c1 = self._board[0][0] + self._board[0][1] + self._board[0][2]
         if abs(c1) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         c2 = self._board[1][0] + self._board[1][1] + self._board[1][2]
         if abs(c2) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         c3 = self._board[2][0] + self._board[2][1] + self._board[2][2]
         if abs(c3) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         r1 = self._board[0][0] + self._board[1][0] + self._board[2][0]
         if abs(r1) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         r2 = self._board[0][1] + self._board[1][1] + self._board[2][1]
         if abs(r2) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         r3 = self._board[0][2] + self._board[1][2] + self._board[2][2]
         if abs(r3) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         b1 = self._board[0][0] + self._board[1][1] + self._board[2][2]
         if abs(b1) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         b2 = self._board[0][2] + self._board[1][1] + self._board[2][0]
         if abs(b2) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+            return
         if self._moves_count > 8:
             self._game_state = GameState.DRAW
     
