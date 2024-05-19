@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Player:
+    player_x_symbol = 'X'
+    player_o_symbol = 'O'
     _value: int
 
     def __post_init__(self):
@@ -20,7 +22,7 @@ class Player:
     
     @property
     def symbol(self):
-        return 'X' if self._value == -1 else 'O'
+        return self.player_x_symbol if self._value == -1 else self.player_o_symbol
     
     @property
     def is_x(self):
