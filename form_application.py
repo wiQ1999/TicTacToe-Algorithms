@@ -1,59 +1,57 @@
 from tkinter import *
-from tkinter import messagebox
-from environments.base_game_env import BaseGameEnv
-from environments.game_state_enum import GameState
-from players.human.human_player import HumanPlayer
-from players.random.random_player import RandomPlayer
+from environments.ui_game_env import UiGameEnv
+from typing import List
 
 class FormApplication:
     _info_font = ('Arial', 12)
     _board_font = ('Arial', 30)
-    _players_dict = {
-        "Human": HumanPlayer(), 
-        "Random": RandomPlayer()}
 
     def __init__(self):
-        self._game = BaseGameEnv()
-        self._player_x = HumanPlayer()
-        self._player_y = RandomPlayer()
+        self._game = UiGameEnv()
         self._root = Tk()
-        self._root.title("Tic Tac Toe")
+        self._root.title('Tic Tac Toe')
+        self._buttons: List[List[Button]] = []
         self._create_info_section()
-        self._buttons = []
         self._create_board_section()
         self._root.resizable(False, False)
 
     def _create_info_section(self):
         info = Frame(self._root)
         info.pack(side=TOP, fill=X, expand=True)
-        status = Frame(info)
         player_x_frame = Frame(info)
         player_x_frame.grid(row=0, column=0)
         player_x_frame.grid_rowconfigure(0, minsize=50)
         player_x_frame.grid_columnconfigure(0, minsize=150)
-        Label(player_x_frame, text="Player X", font=self._info_font).grid(row=0)
-        player_x_str = StringVar(player_x_frame, "Human")
-        self._player_x_cbox = OptionMenu(player_x_frame, player_x_str, 
-                                         *self._players_dict, 
-                                         command=lambda name: self._set_player(name, True))
-        self._player_x_cbox.grid(row=1)
-        status.grid(row=0, column=1)
-        status.grid_rowconfigure(0, minsize=50)
-        status.grid_columnconfigure(0, minsize=150)
-        Label(status, text="Status:", font=self._info_font).grid(row=0)
-        self._status_lable = Label(status, font=self._info_font)
-        self._status_lable.grid(row=1)
-        Button(status, text='Resetuj', font=self._info_font, command=self.restart_game).grid(row=1)
-        player_y_frame = Frame(info)
-        player_y_frame.grid(row=0, column=2)
-        player_y_frame.grid_rowconfigure(0, minsize=50)
-        player_y_frame.grid_columnconfigure(0, minsize=150)
-        Label(player_y_frame, text="Player O", font=self._info_font).grid(row=0)
-        player_y_str = StringVar(player_y_frame, "Random")
-        self._player_y_cbox = OptionMenu(player_y_frame, player_y_str, 
-                                         *self._players_dict, 
-                                         command=lambda name: self._set_player(name, False))
-        self._player_y_cbox.grid(row=1)
+        Label(player_x_frame, text='Player X', font=self._info_font).grid(row=0)
+        player_x_str = StringVar(player_x_frame, self._game.player_x)
+        player_x_cbox = OptionMenu(player_x_frame, player_x_str, *self._game.available_players, command=lambda name: self._player_on_select(name, True))
+        player_x_cbox.grid(row=1)
+        state_frame = Frame(info)
+        state_frame.grid(row=0, column=1)
+        state_frame.grid_rowconfigure(0, minsize=50)
+        state_frame.grid_columnconfigure(0, minsize=150)
+        self._state_lable = Label(state_frame, text=f'State: {self._game.state}', font=self._info_font)
+        self._state_lable.grid(row=0)
+        Button(state_frame, text='Resetuj', font=self._info_font, command=self._restart_on_click).grid(row=1)
+        player_o_frame = Frame(info)
+        player_o_frame.grid(row=0, column=2)
+        player_o_frame.grid_rowconfigure(0, minsize=50)
+        player_o_frame.grid_columnconfigure(0, minsize=150)
+        Label(player_o_frame, text='Player O', font=self._info_font).grid(row=0)
+        player_o_str = StringVar(player_o_frame, self._game.player_o)
+        self._player_o_cbox = OptionMenu(player_o_frame, player_o_str, *self._game.available_players, command=lambda name: self._player_on_select(name, False))
+        self._player_o_cbox.grid(row=1)
+
+    def _player_on_select(self, name: StringVar, is_x: bool):
+        if is_x:
+            self._game.player_x = name
+        else:
+            self._game.player_o = name
+        self._update_view()
+
+    def _restart_on_click(self):
+        self._game.restart()
+        self._update_view()
 
     def _create_board_section(self):
         board = Frame(self._root)
@@ -63,68 +61,32 @@ class FormApplication:
             for y in range(3):
                 pos = Button(board, text='', 
                              font=self._board_font, 
-                             command=lambda ix=x, iy=y: self._set_position(ix, iy))
+                             command=lambda ix=x, iy=y: self._position_on_click(ix, iy))
                 pos.grid(row=x, column=y, sticky="nsew")
                 board.grid_columnconfigure(x, minsize=150)
                 board.grid_rowconfigure(y, minsize=150)
                 row.append(pos)
             self._buttons.append(row)
 
-    def _switch_positions(self, activity: bool):
-        button_state = ACTIVE if activity else DISABLED
+    def _position_on_click(self, x: int, y: int):
+        is_moved = self._game.manual_move(x, y)
+        if is_moved:
+            self._update_view()
+
+    def _update_view(self):
+        self._state_lable.configure(text=f'State: {self._game.state}')
+        symbols = self._game.board_symbols
+        button_state = ACTIVE if self._game.board_modifiability else DISABLED
         for x in range(3):
             for y in range(3):
-                self._buttons[x][y].config(state=button_state)
-
-    def _set_player(self, name: StringVar, is_x: bool):
-        new_player = self._players_dict[name]
-        new_player_type = type(new_player)
-        if is_x and type(self._player_x) is not new_player_type:
-            self._player_x = new_player
-        elif not is_x and type(self._player_y) is not new_player_type:
-            self._player_y = new_player
-        else: 
-            return
-        self.restart_game()
-
-    def _set_position(self, x: int, y: int):
-        if self._game.is_position_taken(x, y):
-            return
-        symbol = self._game.current_player.symbol
-        self._game.move(x, y)
-        self._buttons[x][y].config(text=symbol)
-        if self._game.game_state == GameState.PLAYING:
-            self._root.after(0, self._player_auto_move)
-            return
-        elif self._game.game_state == GameState.DRAW:
-            self._switch_positions(False)
-            messagebox.showinfo("Game Over", "It's a draw!")
-        else:
-            self._switch_positions(False)
-            messagebox.showinfo("Game Over", f"Player {symbol} wins!")
+                self._buttons[x][y].configure(text=symbols[x][y], state=button_state)
 
     def run(self):
-        self._root.after(0, self._player_auto_move)
+        self._auto_move_loop()
         self._root.mainloop()
 
-    def _player_auto_move(self):
-        current_player = None
-        if self._game.current_player.is_x:
-            current_player = self._player_x
-        else:
-            current_player = self._player_y
-        if current_player.is_clickable:
-            return
-        x, y = current_player.auto_move(self._game)
-        symbol = self._game.current_player.symbol
-        self._game.move(x, y)
-        self._buttons[x][y].config(text=symbol)
-        self._player_auto_move()
-
-    def restart_game(self):
-        self._game.restart()
-        self._switch_positions(True)
-        for x in range(3):
-            for y in range(3):
-                self._buttons[x][y].config(text='')
-        self._root.after(0, self._player_auto_move)
+    def _auto_move_loop(self):
+        is_moved = self._game.consider_auto_move()
+        if is_moved:
+            self._update_view()
+        self._root.after(100, self._auto_move_loop)
