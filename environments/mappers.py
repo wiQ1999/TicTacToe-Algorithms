@@ -9,5 +9,5 @@ PLAYER_VALUE_TO_CHAR = {
 
 PLAYER_TO_WIN_GAME_STATE = {
     Player.create_x(): GameState.X_WIN,
-    Player.create_y(): GameState.Y_WIN
+    Player.create_y(): GameState.O_WIN
 }
