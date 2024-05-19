@@ -2,6 +2,7 @@ import copy as Copy
 from environments.player_data import Player
 from environments.game_state_enum import GameState
 from environments.mappers import PLAYER_VALUE_TO_CHAR, PLAYER_TO_WIN_GAME_STATE
+from typing import List
 
 class BaseGameEnv:
     def __init__(self, board = None):
@@ -20,6 +21,22 @@ class BaseGameEnv:
     @property
     def game_state(self):
         return self._game_state
+    
+    @property
+    def board_symbols(self) -> List[List[str]]:
+        symbols = []
+        for x in range(3):
+            temp = []
+            for y in range(3):
+                position = self._board[x][y]
+                if position == -1:
+                    temp.append(Player.player_x_symbol)
+                elif position == 0:
+                    temp.append(' ')
+                else:
+                    temp.append(Player.player_o_symbol)
+            symbols.append(temp)
+        return symbols
     
     def _check_state(self):
         c1 = self._board[0][0] + self._board[0][1] + self._board[0][2]
