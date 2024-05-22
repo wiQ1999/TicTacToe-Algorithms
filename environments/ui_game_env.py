@@ -16,7 +16,7 @@ class UiGameEnv:
     def __init__(self):
         self._game = BaseGameEnv()
         self._player_x = self.available_players[0]
-        self._player_o = self.available_players[1]
+        self._player_o = self.available_players[2]
         
     @property
     def player_x(self) -> str:
