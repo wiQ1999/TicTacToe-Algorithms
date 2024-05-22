@@ -10,13 +10,17 @@ class BaseGameEnv:
             self._board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         else:
             self._board = board
-        self._moves_count = 0
+        self._turn_count = 0
         self._player = Player.create_x()
         self._game_state = GameState.PLAYING
     
     @property
     def current_player(self):
         return self._player
+    
+    @property
+    def turn_count(self) -> int:
+        return self._turn_count
 
     @property
     def game_state(self):
@@ -71,7 +75,7 @@ class BaseGameEnv:
         if abs(b2) == 3:
             self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
             return
-        if self._moves_count > 8:
+        if self._turn_count > 8:
             self._game_state = GameState.DRAW
     
     def is_position_taken(self, x: int, y: int):
@@ -83,7 +87,7 @@ class BaseGameEnv:
         if self.is_position_taken(x, y):
             raise Exception(f'Position ({x},{y}) is already taken.')
         self._board[x][y] = self._player.value
-        self._moves_count += 1
+        self._turn_count += 1
         self._check_state()
         self._player = self._player.switch_player()
     
@@ -98,7 +102,7 @@ class BaseGameEnv:
     
     def restart(self):
         self._board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-        self._moves_count = 0
+        self._turn_count = 0
         self._player = Player.create_x()
         self._game_state = GameState.PLAYING
 
