@@ -1,5 +1,5 @@
 from environments.base_game_env import BaseGameEnv
-from players.dqn.AgentEnv import AgentEnv
+from players.dqn.agent_env import AgentEnv
 from players.dqn.dqn_agent import DQNAgent
 
 def train_dqn(env, agent, episodes=1000, epsilon_start=1.0, epsilon_end=0.1, epsilon_decay=0.995):
