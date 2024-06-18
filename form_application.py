@@ -14,6 +14,7 @@ class FormApplication:
         self._create_info_section()
         self._create_board_section()
         self._root.resizable(False, False)
+        
 
     def _create_info_section(self):
         info = Frame(self._root)
@@ -90,3 +91,40 @@ class FormApplication:
         if is_moved:
             self._update_view()
         self._root.after(100, self._auto_move_loop)
+
+class TicTacToeApp:
+    def __init__(self):
+        self.window = Tk()
+        self.window.title("Tic-Tac-Toe")
+        self._game = UiGameEnv()
+        self._board = [[StringVar() for _ in range(3)] for _ in range(3)]
+        self.create_widgets()
+
+    def create_widgets(self):
+        for x in range(3):
+            for y in range(3):
+                button = Button(self.window, textvariable=self._board[x][y], font='Arial 20', width=5, height=2,
+                                command=lambda ix=x, iy=y: self._position_on_click(ix, iy))
+                button.grid(row=x, column=y)
+
+    def _position_on_click(self, x, y):
+        if self._game.board_modifiability:
+            is_moved = self._game.manual_move(x, y)
+            if is_moved:
+                self.update_board()
+                if self._game.state == "PLAYING":
+                    self._game.consider_auto_move()
+                    self.update_board()
+
+    def update_board(self):
+        board_symbols = self._game.board_symbols
+        for x in range(3):
+            for y in range(3):
+                self._board[x][y].set(board_symbols[x][y])
+
+    def run(self):
+        self.window.mainloop()
+
+if __name__ == "__main__":
+    app = TicTacToeApp()
+    app.run()
