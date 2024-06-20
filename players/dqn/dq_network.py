@@ -2,14 +2,18 @@ import torch
 import torch.nn as nn
 
 class DQNetwork(nn.Module):
-    def __init__(self, state_size: int, action_size: int):
+    def __init__(self):
         super(DQNetwork, self).__init__()
-        self.fc1 = nn.Linear(state_size, 128)
-        self.fc2 = nn.Linear(128, 128)
-        self.fc3 = nn.Linear(128, action_size)
+        self.flatten = nn.Flatten(0, 1)
+        self.seq = nn.Sequential(
+            nn.Linear(9, 36),
+            nn.ReLU(),
+            nn.Linear(36, 36),
+            nn.ReLU(),
+            nn.Linear(36, 9),
+            nn.Sigmoid()
+        )
 
     def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = torch.sigmoid(self.fc3(x))
-        return x
+        x = self.flatten(x)
+        return self.seq(x)
