@@ -1,47 +1,52 @@
+import torch
 from environments.base_game_env import BaseGameEnv
+from players.abstract_player import AbstractPlayer
 from players.dqn.agent_env import AgentEnv
 from players.dqn.dqn_agent import DQNAgent
+from typing import Tuple
 
-def train_dqn(env, agent, episodes=1000, epsilon_start=1.0, epsilon_end=0.1, epsilon_decay=0.995):
-    epsilon = epsilon_start
-    for episode in range(episodes):
-        state = env.reset()
-        done = False
-        while not done:
-            action_idx = agent.get_action(state, epsilon)
-            action = env.available_actions()[action_idx]
-            next_state, reward, done = env.step(action)
-            agent.buffer.add((state, action_idx, reward, next_state, done))
-            state = next_state
-            agent.train_step()
-        epsilon = max(epsilon * epsilon_decay, epsilon_end)
-        if (episode + 1) % 100 == 0:
-            print(f"Episode {episode + 1}/{episodes} - Epsilon: {epsilon:.3f}")
-    print("Training finished.")
+class DQNPlayer(AbstractPlayer):
+    def __init__(self) -> None:
+        super().__init__()
+        self.episodes = 1000
+        self.epsilon_start = 1.0
+        self.epsilon_end = 0.05
+        self.epsilon_decay = 0.996
+        self.buffer_size = 1000
+        self.batch_size = 128
+        self.gamma = 0.99
+        self.lr = 0.001
+        self.update_target_every = 50
+        self.env = AgentEnv()
+        self.agent = DQNAgent(self.buffer_size, self.batch_size, self.gamma, self.lr, self.update_target_every)
+        self.is_trained = False
 
-# Initialize the environment and agent
-game = BaseGameEnv()
-env = AgentEnv(game)
-state_size = 9  # 3x3 TicTacToe board flattened
-action_size = len(env.available_actions())
-agent = DQNAgent(state_size, action_size)
+    @property
+    def is_clickable(self) -> bool:
+        return False
 
-# Train the DQN agent
-train_dqn(env, agent)
-
-def play_game(env, agent, epsilon=0.0):
-    state = env.reset()
-    done = False
-    while not done:
-        if env.game.current_player == "X":
-            action_idx = agent.get_action(state, epsilon)
-            action = env.available_actions()[action_idx]
-        else:
-            # Human player or another bot can make a move here
-            action = env.available_actions()[0]  # Example: always take the first available move
-        state, _, done = env.step(action)
-        env.game.print_board()  # Print the board for visualization
-    print("Game Over")
-
-# Play a game against the trained agent
-play_game(env, agent)
+    def auto_move(self, game_state: BaseGameEnv) -> Tuple[int, int]:
+        if not self.is_trained:
+            self.train_network()
+            self.is_trained = True
+        state = self.env.load(game_state)
+        action_idx = self.agent.select_target_action(self.env, state)
+        x = action_idx // 3
+        y = action_idx % 3
+        return (x, y)
+    
+    def train_network(self):
+        epsilon = self.epsilon_start
+        for episode in range(self.episodes):
+            state = self.env.reset()
+            done = False
+            while not done:
+                action_idx = self.agent.select_train_action(self.env, state, epsilon)
+                next_state, reward, done = self.env.step(action_idx)
+                self.agent.buffer.add((state, action_idx, reward, next_state, done))
+                state = next_state
+                self.agent.train_step()
+            epsilon = max(epsilon * self.epsilon_decay, self.epsilon_end)
+            if (episode + 1) % 100 == 0:
+                print(f"Episode {episode + 1}/{self.episodes} - Epsilon: {epsilon:.3f}")
+        print("Training finished.")

@@ -1,4 +1,3 @@
-import numpy as np
 from typing import Tuple, Literal, List
 from environments.base_game_env import BaseGameEnv
 from environments.game_state_enum import GameState
@@ -8,16 +7,25 @@ class AgentEnv:
         self._game = BaseGameEnv()
         self._wrong_move = False
     
-    def reset(self) -> np.ndarray:
+    def load(self, game: BaseGameEnv) -> List[int]:
+        self._game = game
+        self._wrong_move = False
+        return self.get_state()
+
+    def reset(self) -> List[int]:
         self._game.restart()
         self._wrong_move = False
         return self.get_state()
     
-    def available_actions(self) -> List[Tuple[int, int]]:
-        return self._game.available_moves()
+    def available_actions(self) -> List[int]:
+        actions = []
+        for pos in self._game.available_moves():
+            index = pos[0] * 3 + pos[1]
+            actions.append(index)    
+        return actions
 
-    def get_state(self) -> np.ndarray:
-        return np.array(self._game._board).flatten()
+    def get_state(self) -> List[int]:
+        return [x for y in self._game._board for x in y]
 
     def get_reward(self) -> Literal[-1, 0, 1]:
         if self._wrong_move:
@@ -29,10 +37,10 @@ class AgentEnv:
         else:
             return 0
 
-    def is_done(self):
+    def is_done(self) -> bool:
         return self._wrong_move or self._game.game_state != GameState.PLAYING
     
-    def step(self, action: int) -> Tuple[np.ndarray, Literal[-1, 0, 1], bool]:
+    def step(self, action: int) -> Tuple[List[int], Literal[-1, 0, 1], bool]:
         x = action // 3
         y = action % 3
         if self._game.is_position_taken(x, y):
