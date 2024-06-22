@@ -2,6 +2,7 @@ from environments.base_game_env import BaseGameEnv
 from environments.game_state_enum import GameState
 from players.abstract_player import AbstractPlayer
 from players.human.human_player import HumanPlayer
+from players.mcts.mcts_player import MCTSPlayer
 from players.random.random_player import RandomPlayer
 from players.minimax.minimax_player import MiniMaxPlayer
 from players.dqn.dqn_player import DQNPlayer
@@ -12,6 +13,7 @@ class UiGameEnv:
         'Human': HumanPlayer(), 
         'Random': RandomPlayer(),
         'MiniMax': MiniMaxPlayer(),
+        "MCTS": MCTSPlayer(),
         'DQN': DQNPlayer()
     }
 
