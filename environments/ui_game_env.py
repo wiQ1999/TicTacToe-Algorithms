@@ -5,6 +5,7 @@ from players.human.human_player import HumanPlayer
 from players.mcts.mcts_player import MCTSPlayer
 from players.random.random_player import RandomPlayer
 from players.minimax.minimax_player import MiniMaxPlayer
+from players.qlearning.qlearning_player import QLearningPlayer
 from players.dqn.dqn_player import DQNPlayer
 from typing import Dict, List
 
@@ -13,6 +14,7 @@ class UiGameEnv:
         'Human': HumanPlayer(), 
         'Random': RandomPlayer(),
         'MiniMax': MiniMaxPlayer(),
+        'Q-Learning': QLearningPlayer(),
         "MCTS": MCTSPlayer(),
         'DQN': DQNPlayer()
     }
@@ -65,18 +67,24 @@ class UiGameEnv:
     def manual_move(self, x: int, y: int) -> bool:
         if self._game.is_position_taken(x, y):
             return False
-        self._game.move(x, y)
+        reward, current_state, next_state = self._game.move(x, y)
+        current_player = self._get_current_player()
+        if isinstance(current_player, QLearningPlayer):
+            current_player.update_q_table(current_state, (x, y), reward, next_state)
         return True
 
     def consider_auto_move(self) -> bool:
         if self._game.game_state != GameState.PLAYING or self._get_current_player().is_clickable:
             return False
+        current_player = self._get_current_player()
         position = None
         if self._game.current_player.is_x:
-            position = self._players_dict[self._player_x].auto_move(self._game)
+            position = current_player.auto_move(self._game)
         else:
-            position = self._players_dict[self._player_o].auto_move(self._game)
-        self._game.move(position[0], position[1])
+            position = current_player.auto_move(self._game)
+        reward, current_state, next_state = self._game.move(position[0], position[1])
+        if isinstance(current_player, QLearningPlayer):
+            current_player.update_q_table(current_state, position, reward, next_state)
         return True
 
     def restart(self):
