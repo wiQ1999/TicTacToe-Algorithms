@@ -2,7 +2,7 @@ import random
 from collections import deque
 
 class ReplayBuffer:
-    def __init__(self, buffer_size):
+    def __init__(self, buffer_size=1000):
         self.buffer = deque(maxlen=buffer_size)
 
     def add(self, experience):
