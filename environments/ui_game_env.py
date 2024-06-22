@@ -4,13 +4,15 @@ from players.abstract_player import AbstractPlayer
 from players.human.human_player import HumanPlayer
 from players.random.random_player import RandomPlayer
 from players.minimax.minimax_player import MiniMaxPlayer
+from players.dqn.dqn_player import DQNPlayer
 from typing import Dict, List
 
 class UiGameEnv:
     _players_dict: Dict[str, AbstractPlayer] = {
         'Human': HumanPlayer(), 
         'Random': RandomPlayer(),
-        'MiniMax': MiniMaxPlayer()
+        'MiniMax': MiniMaxPlayer(),
+        'DQN': DQNPlayer()
     }
 
     def __init__(self):
