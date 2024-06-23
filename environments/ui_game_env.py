@@ -1,4 +1,5 @@
 from environments.base_game_env import BaseGameEnv
+from environments.player_data import Player
 from environments.game_state_enum import GameState
 from players.abstract_player import AbstractPlayer
 from players.human.human_player import HumanPlayer
@@ -27,6 +28,7 @@ class UiGameEnv:
     @player_x.setter
     def player_x(self, value):
         self._player_x = value
+        self._players_dict[value].init_player(Player.create_x())
         self._game.restart()
 
     @property
@@ -36,6 +38,7 @@ class UiGameEnv:
     @player_o.setter
     def player_o(self, value: str):
         self._player_o = value
+        self._players_dict[value].init_player(Player.create_y())
         self._game.restart()
 
     @property
@@ -57,13 +60,16 @@ class UiGameEnv:
     def _get_current_player(self):
         if self._game.current_player.is_x:
             return self._players_dict[self._player_x]
+            
         else:
             return self._players_dict[self._player_o]
         
     def manual_move(self, x: int, y: int) -> bool:
         if self._game.is_position_taken(x, y):
             return False
-        self._game.move(x, y)
+        self._game.move(x,y)
+        self._players_dict[self.player_x].after_any_move(self._game)
+        self._players_dict[self.player_o].after_any_move(self._game)
         return True
 
     def consider_auto_move(self) -> bool:
@@ -76,6 +82,8 @@ class UiGameEnv:
         else:
             position = current_player.auto_move(self._game)
         reward, current_state, next_state = self._game.move(position[0], position[1])
+        self._players_dict[self.player_x].after_any_move(self._game)
+        self._players_dict[self.player_o].after_any_move(self._game)
         if isinstance(current_player, QLearningPlayer):
             current_player.update_q_table(current_state, position, reward, next_state)
         return True
