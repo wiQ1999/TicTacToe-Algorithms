@@ -42,7 +42,7 @@ class QLearningAlgorithm:
         old_value = self.q_table[state_key][action]
         next_max = max(self.q_table[next_state_key].values(), default=0)
 
-        reward = QLearningAlgorithm.get_reward(env)
+        # reward = QLearningAlgorithm.get_reward(env)
 
         # Q-learning update equation
         new_value = old_value + self.alpha * (reward + self.gamma * next_max - old_value)
@@ -61,22 +61,22 @@ class QLearningAlgorithm:
         except FileNotFoundError:
             print(f"No Q-table file found at {file_path}, starting with an empty Q-table.")
 
-    def get_reward(env: BaseGameEnv):
-        current_player_value = env.current_player.value
-        print(f"QL Player is: {current_player_value}")
-        if env.game_state == GameState.X_WIN:
-            if current_player_value == 1:
-                reward = -1  # Negative reward for O if X wins
-            else:
-                reward = 1
-        elif env.game_state == GameState.O_WIN:
-            if current_player_value == 1:
-                reward = 1  # Positive reward for O if O wins
-            else:
-                reward = -1
-        elif env.game_state == GameState.DRAW:
-            reward = 0  # Neutral reward for draw
-        else:
-            reward = 0  # No win/loss/draw yet
+    # def get_reward(env: BaseGameEnv):
+    #     current_player_value = env.current_player.value
+    #     print(f"QL Player is: {current_player_value}")
+    #     if env.game_state == GameState.X_WIN:
+    #         if current_player_value == 1:
+    #             reward = -1  # Negative reward for O if X wins
+    #         else:
+    #             reward = 1
+    #     elif env.game_state == GameState.O_WIN:
+    #         if current_player_value == 1:
+    #             reward = 1  # Positive reward for O if O wins
+    #         else:
+    #             reward = -1
+    #     elif env.game_state == GameState.DRAW:
+    #         reward = 0  # Neutral reward for draw
+    #     else:
+    #         reward = 0  # No win/loss/draw yet
 
-        return reward
+    #     return reward

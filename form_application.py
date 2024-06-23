@@ -90,4 +90,3 @@ class FormApplication:
         if is_moved:
             self._update_view()
         self._root.after(100, self._auto_move_loop)
-        

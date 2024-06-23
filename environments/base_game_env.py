@@ -4,7 +4,6 @@ from environments.game_state_enum import GameState
 from environments.mappers import PLAYER_VALUE_TO_CHAR, PLAYER_TO_WIN_GAME_STATE
 from typing import List
 
-
 class BaseGameEnv:
     def __init__(self, board = None):
         self.restart()
@@ -39,12 +38,12 @@ class BaseGameEnv:
                 return
         s = sum(self._board[i][i] for i in range(3))
         if abs(s) == 3:
-            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
-            return
+                self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+                return
         s = sum(self._board[i][2 - i] for i in range(3))
         if abs(s) == 3:
-            self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
-            return
+                self._game_state = PLAYER_TO_WIN_GAME_STATE[self._player]
+                return
         if self._turn_count > 8:
             self._game_state = GameState.DRAW
 
@@ -87,7 +86,6 @@ class BaseGameEnv:
         self._turn_count = 0
         self._player = Player.create_x()
         self._game_state = GameState.PLAYING
-        return self._board
 
     def copy(self):
         return Copy.deepcopy(self)
@@ -96,4 +94,3 @@ class BaseGameEnv:
         for y in range(2):
             print('|'.join([PLAYER_VALUE_TO_CHAR[x] for x in self._board[y]]))
             print('-+-+-')
-        print('|'.join([PLAYER_VALUE_TO_CHAR[x] for x in self._board[2]]))
