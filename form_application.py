@@ -14,7 +14,6 @@ class FormApplication:
         self._create_info_section()
         self._create_board_section()
         self._root.resizable(False, False)
-        
 
     def _create_info_section(self):
         info = Frame(self._root)
@@ -91,4 +90,4 @@ class FormApplication:
         if is_moved:
             self._update_view()
         self._root.after(100, self._auto_move_loop)
-
+        

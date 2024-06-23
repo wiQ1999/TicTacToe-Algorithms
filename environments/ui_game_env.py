@@ -65,6 +65,7 @@ class UiGameEnv:
         if self._game.is_position_taken(x, y):
             return False
         self._game.move(x,y)
+        return True
 
     def consider_auto_move(self) -> bool:
         if self._game.game_state != GameState.PLAYING or self._get_current_player().is_clickable:

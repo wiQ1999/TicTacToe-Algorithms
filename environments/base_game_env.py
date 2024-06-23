@@ -13,7 +13,6 @@ class BaseGameEnv:
     
     @property
     def current_player(self):
-        #print(self.current_player.is_clickable)
         return self._player
     
     @property
