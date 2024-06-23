@@ -14,7 +14,6 @@ def train_qlearning(num_episodes=10000, alpha=0.3, gamma=0.9, epsilon=0.9):
             available_moves = env.available_moves()
             action = qlearning.choose_action(env, available_moves)
 
-            # Sprawdzenie czy wybrana pozycja jest już zajęta
             if action not in available_moves:
                 continue
 
@@ -24,7 +23,6 @@ def train_qlearning(num_episodes=10000, alpha=0.3, gamma=0.9, epsilon=0.9):
             qlearning.update_q_table(current_state, action, reward, next_state)
             move_count += 1
 
-            # Dodanie komunikatów informacyjnych tylko dla ruchu Q-learning
             print(f"Q-learning episode {episode}, move {move_count}:")
             print(f"Chosen action: {action}")
             print(f"Reward: {reward}")

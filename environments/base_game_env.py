@@ -94,3 +94,4 @@ class BaseGameEnv:
         for y in range(2):
             print('|'.join([PLAYER_VALUE_TO_CHAR[x] for x in self._board[y]]))
             print('-+-+-')
+        print('|'.join([PLAYER_VALUE_TO_CHAR[x] for x in self._board[2]]))
