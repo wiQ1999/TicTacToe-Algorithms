@@ -18,15 +18,14 @@ def train_qlearning(num_episodes=10000, alpha=0.3, gamma=0.9, epsilon=0.9):
                 continue
 
             current_state = env.copy()
-            reward, current_state, next_state = env.move(action[0], action[1])
+            
+            env.move(action[0], action[1])
+            reward = env._reward
+            current_state = env._current_state
+            next_state = env._next_state
 
             qlearning.update_q_table(current_state, action, reward, next_state)
             move_count += 1
-
-            print(f"Q-learning episode {episode}, move {move_count}:")
-            print(f"Chosen action: {action}")
-            print(f"Reward: {reward}")
-            print("")
 
         if episode % 100 == 0:
             print(f'Episode {episode}/{num_episodes} completed. Moves in episode: {move_count}')

@@ -17,12 +17,14 @@ class QLearningPlayer(AbstractPlayer):
         available_moves = game_state.available_moves()
         return self.qlearning.choose_action(game_state, available_moves)
 
-    def update_q_table(self, current_state, action, reward, next_state):
-        self.qlearning.update_q_table(current_state, action, reward, next_state)
+    # def update_q_table(self, current_state, action, reward, next_state):
+    #     self.qlearning.update_q_table(current_state, action, reward, next_state)
     
     def after_any_move(self, game: BaseGameEnv):
         print(f"After move: game: {game}, player: {game.current_player}")
-        if game.game_state != GameState.PLAYING and game.current_player is not self._player:
+        if game.game_state != GameState.PLAYING:
+            print(game.game_state)
             self.qlearning.update_q_table(game._current_state, game._position, game._reward, game._next_state)
+        return
     
 

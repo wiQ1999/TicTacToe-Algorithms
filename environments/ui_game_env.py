@@ -72,11 +72,8 @@ class UiGameEnv:
         if self._game.is_position_taken(x, y):
             return False
         self._game.move(x,y)
-        print("Print A")
         self._players_dict[self.player_x].after_any_move(self._game)
-        print("XXXXXXXXXXXXXXXXXXXX")
         self._players_dict[self.player_o].after_any_move(self._game)
-        print("Print B")
         return True
 
     def consider_auto_move(self) -> bool:
@@ -89,11 +86,8 @@ class UiGameEnv:
         else:
             position = current_player.auto_move(self._game)
         self._game.move(position[0], position[1])
-        print("Print A")
         self._players_dict[self.player_x].after_any_move(self._game)
-        print("XXXXXXXXXXXXXXXXXXXX")
         self._players_dict[self.player_o].after_any_move(self._game)
-        print("Print B")
         # if isinstance(current_player, QLearningPlayer):
         #     current_player.update_q_table(current_state, position, reward, next_state)
         return True
