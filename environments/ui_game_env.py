@@ -20,6 +20,8 @@ class UiGameEnv:
         self._game = BaseGameEnv()
         self._player_x = self.available_players[0]
         self._player_o = self.available_players[2]
+        self._players_dict[self.player_x].init_player(Player.create_x())
+        self._players_dict[self.player_o].init_player(Player.create_y())
         
     @property
     def player_x(self) -> str:
@@ -30,6 +32,7 @@ class UiGameEnv:
         self._player_x = value
         self._players_dict[value].init_player(Player.create_x())
         self._game.restart()
+        print(f"Player X: {self._players_dict[value]._player}")
 
     @property
     def player_o(self) -> str:
@@ -40,6 +43,7 @@ class UiGameEnv:
         self._player_o = value
         self._players_dict[value].init_player(Player.create_y())
         self._game.restart()
+        print(f"Player O: {self._players_dict[value]._player}")
 
     @property
     def available_players(self):
@@ -68,8 +72,11 @@ class UiGameEnv:
         if self._game.is_position_taken(x, y):
             return False
         self._game.move(x,y)
+        print("Print A")
         self._players_dict[self.player_x].after_any_move(self._game)
+        print("XXXXXXXXXXXXXXXXXXXX")
         self._players_dict[self.player_o].after_any_move(self._game)
+        print("Print B")
         return True
 
     def consider_auto_move(self) -> bool:
@@ -81,11 +88,14 @@ class UiGameEnv:
             position = current_player.auto_move(self._game)
         else:
             position = current_player.auto_move(self._game)
-        reward, current_state, next_state = self._game.move(position[0], position[1])
+        self._game.move(position[0], position[1])
+        print("Print A")
         self._players_dict[self.player_x].after_any_move(self._game)
+        print("XXXXXXXXXXXXXXXXXXXX")
         self._players_dict[self.player_o].after_any_move(self._game)
-        if isinstance(current_player, QLearningPlayer):
-            current_player.update_q_table(current_state, position, reward, next_state)
+        print("Print B")
+        # if isinstance(current_player, QLearningPlayer):
+        #     current_player.update_q_table(current_state, position, reward, next_state)
         return True
 
     def restart(self):

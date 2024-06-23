@@ -1,5 +1,6 @@
 from players.abstract_player import AbstractPlayer
 from environments.base_game_env import BaseGameEnv
+from environments.game_state_enum import GameState
 from players.qlearning.qlearning_algorithm import QLearningAlgorithm
 from typing import Tuple
 
@@ -18,3 +19,10 @@ class QLearningPlayer(AbstractPlayer):
 
     def update_q_table(self, current_state, action, reward, next_state):
         self.qlearning.update_q_table(current_state, action, reward, next_state)
+    
+    def after_any_move(self, game: BaseGameEnv):
+        print(f"After move: game: {game}, player: {game.current_player}")
+        if game.game_state != GameState.PLAYING and game.current_player is not self._player:
+            self.qlearning.update_q_table(game._current_state, game._position, game._reward, game._next_state)
+    
+

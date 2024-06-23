@@ -55,14 +55,14 @@ class BaseGameEnv:
             raise Exception(f'The game is finished.')
         if self.is_position_taken(x, y):
             raise Exception(f'Position ({x},{y}) is already taken.')
-        current_state = self.copy()  # Stan przed ruchem
+        self._current_state = self.copy()  # Stan przed ruchem
         self._board[x][y] = self._player.value
         self._turn_count += 1
         self._check_state()
-        reward = self._get_reward()
-        next_state = self.copy()  # Stan po ruchu
+        self._reward = self._get_reward()
+        self._position = (x,y)
+        self._next_state = self.copy()  # Stan po ruchu
         self._player = self._player.switch_player()
-        return reward, current_state, next_state
 
     def _get_reward(self):
         if self._game_state == GameState.X_WIN:
