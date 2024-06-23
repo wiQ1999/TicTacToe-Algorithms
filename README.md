@@ -15,4 +15,5 @@ The project is based on the credit requirements of the studies course. But on th
     - [x] Random
     - [x] MiniMax
     - [ ] Q-lerning
-    - [ ] Deep Q-lerning
+    - [x] Monte Carlo tree search
+    - [x] Deep Q-lerning
