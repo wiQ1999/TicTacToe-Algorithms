@@ -57,14 +57,13 @@ class UiGameEnv:
     def _get_current_player(self):
         if self._game.current_player.is_x:
             return self._players_dict[self._player_x]
-            
         else:
             return self._players_dict[self._player_o]
         
     def manual_move(self, x: int, y: int) -> bool:
         if self._game.is_position_taken(x, y):
             return False
-        self._game.move(x,y)
+        self._game.move(x, y)
         return True
 
     def consider_auto_move(self) -> bool:

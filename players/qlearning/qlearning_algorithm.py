@@ -26,22 +26,6 @@ class QLearningAlgorithm:
             action = random.choice(best_actions) if best_actions else random.choice(available_moves)
 
         return action
-    
-    # def choose_action(self, env: BaseGameEnv, available_moves) -> tuple:
-    #     state_key = self.get_state_key(env)
-    #     if state_key not in self.q_table:
-    #         self.q_table[state_key] = {move: 0 for move in available_moves}
-
-    #     current_player_value = env.current_player.value  # Odczytaj wartość aktualnego gracza (1 dla O, -1 dla X)
-    #     if current_player_value == 1:
-    #         max_value = max(self.q_table[state_key].values())
-    #         best_actions = [move for move, value in self.q_table[state_key].items() if value == max_value and move in available_moves]
-    #     else:
-    #         min_value = min(self.q_table[state_key].values())
-    #         best_actions = [move for move, value in self.q_table[state_key].items() if value == min_value and move in available_moves]
-
-    #     action = random.choice(best_actions) if best_actions else random.choice(available_moves)
-    #     return action
 
     def update_q_table(self, env: BaseGameEnv, action, reward, next_env: BaseGameEnv):
         state_key = self.get_state_key(env)
@@ -58,7 +42,7 @@ class QLearningAlgorithm:
         old_value = self.q_table[state_key][action]
         next_max = max(self.q_table[next_state_key].values(), default=0)
 
-        # reward = QLearningAlgorithm.get_reward(env)
+        reward = QLearningAlgorithm.get_reward(env)
 
         # Q-learning update equation
         new_value = old_value + self.alpha * (reward + self.gamma * next_max - old_value)
