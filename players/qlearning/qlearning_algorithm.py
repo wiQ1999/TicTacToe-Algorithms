@@ -2,7 +2,6 @@ import random
 import pickle
 from environments.base_game_env import BaseGameEnv
 from environments.game_state_enum import GameState
-# from environments.ui_game_env import UiGameEnv
 
 class QLearningAlgorithm:
     def __init__(self, alpha=0.3, gamma=0.99, epsilon=0.1, q_table=None):
@@ -19,23 +18,32 @@ class QLearningAlgorithm:
         if state_key not in self.q_table:
             self.q_table[state_key] = {move: 0 for move in available_moves}
 
-        current_player_value = env.current_player.value  # Odczytaj wartość aktualnego gracza (1 dla O, -1 dla X)
-        if current_player_value == 1:
+        if random.uniform(0, 1) < self.epsilon:
+            action = random.choice(available_moves)
+        else:
             max_value = max(self.q_table[state_key].values())
             best_actions = [move for move, value in self.q_table[state_key].items() if value == max_value and move in available_moves]
-        else:
-            min_value = min(self.q_table[state_key].values())
-            best_actions = [move for move, value in self.q_table[state_key].items() if value == min_value and move in available_moves]
+            action = random.choice(best_actions) if best_actions else random.choice(available_moves)
 
-        action = random.choice(best_actions) if best_actions else random.choice(available_moves)
         return action
+    
+    # def choose_action(self, env: BaseGameEnv, available_moves) -> tuple:
+    #     state_key = self.get_state_key(env)
+    #     if state_key not in self.q_table:
+    #         self.q_table[state_key] = {move: 0 for move in available_moves}
+
+    #     current_player_value = env.current_player.value  # Odczytaj wartość aktualnego gracza (1 dla O, -1 dla X)
+    #     if current_player_value == 1:
+    #         max_value = max(self.q_table[state_key].values())
+    #         best_actions = [move for move, value in self.q_table[state_key].items() if value == max_value and move in available_moves]
+    #     else:
+    #         min_value = min(self.q_table[state_key].values())
+    #         best_actions = [move for move, value in self.q_table[state_key].items() if value == min_value and move in available_moves]
+
+    #     action = random.choice(best_actions) if best_actions else random.choice(available_moves)
+    #     return action
 
     def update_q_table(self, env: BaseGameEnv, action, reward, next_env: BaseGameEnv):
-        # game_env = UiGameEnv()
-        # game_env._get_current_player()
-        # if game_env == "Q-Learning":  # Sprawdzamy czy gracz jest klikalny
-        print("Q-learning tour!")
-           
         state_key = self.get_state_key(env)
         next_state_key = self.get_state_key(next_env)
 
@@ -50,20 +58,17 @@ class QLearningAlgorithm:
         old_value = self.q_table[state_key][action]
         next_max = max(self.q_table[next_state_key].values(), default=0)
 
-            # Use get_reward function from qlearning_algorithm.py
-        reward = QLearningAlgorithm.get_reward(env)
+        # reward = QLearningAlgorithm.get_reward(env)
 
-            # Q-learning update equation
+        # Q-learning update equation
         new_value = old_value + self.alpha * (reward + self.gamma * next_max - old_value)
+        self.q_table[state_key][action] = new_value
 
-            # Print debug information
         print(f"Updating Q-table for state {state_key}, action {action}:")
         print(f"Old Q-value: {old_value}")
         print(f"Reward: {reward}")
         print(f"Next max Q-value: {next_max}")
         print(f"New Q-value: {new_value}")
-
-        self.q_table[state_key][action] = new_value
 
     def load_q_table(self, file_path='qlearning_table.pkl'):
         try:

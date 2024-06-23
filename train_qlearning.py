@@ -7,6 +7,7 @@ def train_qlearning(num_episodes=10000, alpha=0.3, gamma=0.9, epsilon=0.9):
     qlearning = QLearningAlgorithm(alpha=alpha, gamma=gamma, epsilon=epsilon)
 
     for episode in range(num_episodes):
+        print(f"episode: {episode}")
         env = BaseGameEnv()
         move_count = 0
         while env.game_state == GameState.PLAYING:
@@ -16,6 +17,11 @@ def train_qlearning(num_episodes=10000, alpha=0.3, gamma=0.9, epsilon=0.9):
             # Sprawdzenie czy wybrana pozycja jest już zajęta
             if action not in available_moves:
                 continue
+
+            
+
+            env.move(action[0], action[1])
+            reward, current_state, next_state = get_reward(env)
 
             current_state = env.copy()
             reward, current_state, next_state = env.move(action[0], action[1])

@@ -6,9 +6,9 @@ from typing import List
 
 
 class BaseGameEnv:
-    def __init__(self, board=None):
+    def __init__(self, board = None):
         self.restart()
-        if board is not None:
+        if board != None:
             self._board = board
     
     @property
