@@ -57,17 +57,14 @@ class UiGameEnv:
     def _get_current_player(self):
         if self._game.current_player.is_x:
             return self._players_dict[self._player_x]
+            
         else:
             return self._players_dict[self._player_o]
         
     def manual_move(self, x: int, y: int) -> bool:
         if self._game.is_position_taken(x, y):
             return False
-        reward, current_state, next_state = self._game.move(x, y)
-        current_player = self._get_current_player()
-        if isinstance(current_player, QLearningPlayer):
-            current_player.update_q_table(current_state, (x, y), reward, next_state)
-        return True
+        self._game.move(x,y)
 
     def consider_auto_move(self) -> bool:
         if self._game.game_state != GameState.PLAYING or self._get_current_player().is_clickable:

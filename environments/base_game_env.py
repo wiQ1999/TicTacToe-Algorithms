@@ -4,6 +4,7 @@ from environments.game_state_enum import GameState
 from environments.mappers import PLAYER_VALUE_TO_CHAR, PLAYER_TO_WIN_GAME_STATE
 from typing import List
 
+
 class BaseGameEnv:
     def __init__(self, board=None):
         self.restart()
@@ -12,6 +13,7 @@ class BaseGameEnv:
     
     @property
     def current_player(self):
+        #print(self.current_player.is_clickable)
         return self._player
     
     @property
